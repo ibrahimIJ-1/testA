@@ -22,7 +22,7 @@ class TestController extends Controller
     public function index()
     {
         $batches = Batch::all();
-        return view('dashboard.index');
+        return view('dashboard.index', ['batches' => $batches]);
     }
 
     /**
@@ -45,69 +45,69 @@ class TestController extends Controller
     {
         foreach ($request->all() as $newBatch) {
             $summary = json_decode($newBatch['SummaryReport'], true);
-        // $summary = $request->SummaryReport;
-        if (!$this->checkTerminalExists($newBatch['TerminalId'])) {
-            $terminal = Terminal::create([
-                'merchant_name' => $summary['Merchant'],
-                'terminal_id' => intval($newBatch['TerminalId']),
-            ]);
-        } else {
-            $terminal = Terminal::where('terminal_id', '=', $newBatch['TerminalId'])->get()->first();
-        }
-        if (!$this->checkBatchExists($newBatch['BatchId'])) {
-            $batch = Batch::create([
-                'batch_id' => $newBatch['BatchId'],
-                'BatchNumber' => $newBatch['BatchNumber'],
-                'Mmname' => $newBatch['Mmname'],
-                'terminal_id' => $terminal->id,
-                'TotalAmount' => $newBatch['TotalAmount'],
-                'DateOfClosing' => date('Y-m-d:H:i:s', strtotime($newBatch['DateOfClosing'])),
-                'DateOfCreating' => date('Y-m-d:H:i:s', strtotime($newBatch['DateOfCreating'])),
-            ]);
-            $summaryR = SummaryReport::create([
-                'batch_id' => $batch->id,
-                'merchant' => $summary['Merchant'],
-                'location' => $summary['Location'],
-                // 'app_config_name' => $summary['AppConfigName'],
-                'tpn' => $summary['Tpn'],
-                'report_type' => $summary['ReportType'],
-                // 'open_date' => date('Y-m-d:H:i:s', strtotime($summary['OpenDate'])),
-                'batch_number' => $summary['BatchNumber'],
-                // 'batch_idt' => $summary['BatchId'],
-                // 'close_date' => date('Y-m-d:H:i:s', strtotime($summary['CloseDate'])),
-            ]);
-            foreach ($summary['CardReports'] as $item) {
-                CardsReport::create([
-                    'summary_report_id' => $summaryR->id,
-                    'TypeName' => $item['TypeName'],
-                    'PaymentTypeName' => $item['PaymentReports'][0]['PaymentTypeName'],
-                    // 'SubTotalAmount' => $item['PaymentReports'][0]['SubTotalAmount'],
-                    // 'SubTotalAmountFormatted' => $item['PaymentReports'][0]['SubTotalAmountFormatted'],
-                    // 'SurchargeAmount' => $item['PaymentReports'][0]['SurchargeAmount'],
-                    // 'SurchargeAmountFormatted' => $item['PaymentReports'][0]['SurchargeAmountFormatted'],
-                    'TotalAmount' => $item['PaymentReports'][0]['TotalAmount'],
-                    'TotalNumber' => $item['PaymentReports'][0]['TotalNumber'],
+            // $summary = $request->SummaryReport;
+            if (!$this->checkTerminalExists($newBatch['TerminalId'])) {
+                $terminal = Terminal::create([
+                    'merchant_name' => $summary['Merchant'],
+                    'terminal_id' => intval($newBatch['TerminalId']),
                 ]);
+            } else {
+                $terminal = Terminal::where('terminal_id', '=', $newBatch['TerminalId'])->get()->first();
             }
-        } else {
-            $batch = Batch::where('batch_id', '=', $newBatch['BatchId'])->get()->first();
-        }
-
-        foreach ($newBatch['ListOfTransactions'] as $transaction) {
-            if (!$this->checkTransactionExists($transaction)) {
-                Transaction::create([
-                    'transaction_id' => $transaction,
-                    'batch_id' => $batch->id,
+            if (!$this->checkBatchExists($newBatch['BatchId'])) {
+                $batch = Batch::create([
+                    'batch_id' => $newBatch['BatchId'],
+                    'BatchNumber' => $newBatch['BatchNumber'],
+                    'Mmname' => $newBatch['Mmname'],
                     'terminal_id' => $terminal->id,
+                    'TotalAmount' => $newBatch['TotalAmount'],
+                    'DateOfClosing' => date('Y-m-d:H:i:s', strtotime($newBatch['DateOfClosing'])),
+                    'DateOfCreating' => date('Y-m-d:H:i:s', strtotime($newBatch['DateOfCreating'])),
                 ]);
+                $summaryR = SummaryReport::create([
+                    'batch_id' => $batch->id,
+                    'merchant' => $summary['Merchant'],
+                    'location' => $summary['Location'],
+                    // 'app_config_name' => $summary['AppConfigName'],
+                    'tpn' => $summary['Tpn'],
+                    'report_type' => $summary['ReportType'],
+                    // 'open_date' => date('Y-m-d:H:i:s', strtotime($summary['OpenDate'])),
+                    'batch_number' => $summary['BatchNumber'],
+                    // 'batch_idt' => $summary['BatchId'],
+                    // 'close_date' => date('Y-m-d:H:i:s', strtotime($summary['CloseDate'])),
+                ]);
+                foreach ($summary['CardReports'] as $item) {
+                    CardsReport::create([
+                        'summary_report_id' => $summaryR->id,
+                        'TypeName' => $item['TypeName'],
+                        'PaymentTypeName' => $item['PaymentReports'][0]['PaymentTypeName'],
+                        // 'SubTotalAmount' => $item['PaymentReports'][0]['SubTotalAmount'],
+                        // 'SubTotalAmountFormatted' => $item['PaymentReports'][0]['SubTotalAmountFormatted'],
+                        // 'SurchargeAmount' => $item['PaymentReports'][0]['SurchargeAmount'],
+                        // 'SurchargeAmountFormatted' => $item['PaymentReports'][0]['SurchargeAmountFormatted'],
+                        'TotalAmount' => $item['PaymentReports'][0]['TotalAmount'],
+                        'TotalNumber' => $item['PaymentReports'][0]['TotalNumber'],
+                    ]);
+                }
+            } else {
+                $batch = Batch::where('batch_id', '=', $newBatch['BatchId'])->get()->first();
+            }
+
+            foreach ($newBatch['ListOfTransactions'] as $transaction) {
+                if (!$this->checkTransactionExists($transaction)) {
+                    Transaction::create([
+                        'transaction_id' => $transaction,
+                        'batch_id' => $batch->id,
+                        'terminal_id' => $terminal->id,
+                    ]);
+                }
             }
         }
-        }
-        
 
 
 
-        $message = ['id' => $summary['Tpn'], 'TotalAmount' => $request->TotalAmount, 'TerminalId' => $request->TerminalId, 'MerchantName' => $summary['Merchant']];
+
+        $message = ['id' => $summary['Tpn'], 'TotalAmount' => $request->TotalAmount, 'TerminalId' => $request->TerminalId, 'MerchantName' => $summary['Merchant'], 'detailId' => $batch->id];
         // $message = $request->all();
         Log::alert($request->all());
         // $message = ['id' => 'asdasdad2234234242r24234-24', 'TotalAmount' => 500, 'TerminalId' => '4322234', 'MerchantName' => 'hello word'];
@@ -123,7 +123,8 @@ class TestController extends Controller
      */
     public function show($id)
     {
-        //
+        $batch = Batch::find($id);
+        return view('dashboard.show', ['batch' => $batch]);
     }
 
     /**

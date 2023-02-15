@@ -20,16 +20,26 @@
                 <thead>
                     <tr>
                         <th scope="col">Batch Id</th>
-                        <th scope="col">TotalAmount</th>
+                        <th scope="col">Total Amount</th>
                         {{-- <th scope="col">Amount</th> --}}
                         {{-- <th scope="col">CardHolder</th> --}}
                         {{-- <th scope="col">CardTypeName</th> --}}
-                        <th scope="col">TerminalId</th>
-                        <th scope="col">MerchantName</th>
+                        <th scope="col">Terminal Id</th>
+                        <th scope="col">Merchant Name</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
-
+                    @isset($batches)
+                        @foreach ($batches as $batch)
+                            <tr>
+                                <th scope="row">{{ $batch->batch_id }}</th>
+                                <td>{{ $batch->TotalAmount }}</td>
+                                <td>{{ $batch->terminal->terminal_id }}</td>
+                                <td>{{ $batch->terminal->merchant_name }}</td>
+                                <td><a href="{{ route('test.show', $batch->id) }}">See Details</a></td>
+                            </tr>
+                        @endforeach
+                    @endisset
                 </tbody>
             </table>
         </div>
