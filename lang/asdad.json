@@ -1,0 +1,60 @@
+{
+    "Merchant": "davidPizza",
+    "Location": null,
+    "AppConfigName": null,
+    "Tpn": "2563683616",
+    "ReportType": "CR/DB Summary Report",
+    "OpenDate": "2023-02-13T07:46:54",
+    "BatchNumber": "4",
+    "BatchId": 0,
+    "CloseDate": "2023-02-13T20:50:54",
+    "CardReports": [
+        {
+            "TypeName": "VISA",
+            "PaymentReports": [
+                {
+                    "PaymentTypeName": "Sale",
+                    "SubTotalAmount": null,
+                    "SubTotalAmountFormatted": "$0.00",
+                    "SurchargeAmount": null,
+                    "SurchargeAmountFormatted": "$0.00",
+                    "TotalAmount": "438.62",
+                    "TotalNumber": "26"
+                }
+            ]
+        },
+        {
+            "TypeName": "MASTERCARD",
+            "PaymentReports": [
+                {
+                    "PaymentTypeName": "Sale",
+                    "SubTotalAmount": null,
+                    "SubTotalAmountFormatted": "$0.00",
+                    "SurchargeAmount": null,
+                    "SurchargeAmountFormatted": "$0.00",
+                    "TotalAmount": "46.33",
+                    "TotalNumber": "3"
+                }
+            ]
+        },
+        {
+            "TypeName": "AMEX",
+            "PaymentReports": [
+                {
+                    "PaymentTypeName": "Sale",
+                    "SubTotalAmount": null,
+                    "SubTotalAmountFormatted": "$0.00",
+                    "SurchargeAmount": null,
+                    "SurchargeAmountFormatted": "$0.00",
+                    "TotalAmount": "58.95",
+                    "TotalNumber": "3"
+                }
+            ]
+        }
+    ],
+    "Additionals": {
+        "Transactions Records": "32",
+        "Transactions Total": "543.90",
+        "Tip Total": "$25.81"
+    }
+}
