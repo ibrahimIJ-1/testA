@@ -15,6 +15,4 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::resource('test', TestController::class);
-Route::get('/', function () {
-    return view('dashboard.index');
-});
+Route::get('/', [TestController::class,['index']])->name('getBatches');

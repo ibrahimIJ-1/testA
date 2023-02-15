@@ -21,7 +21,8 @@ class TestController extends Controller
      */
     public function index()
     {
-        Log::alert(request()->all());
+        $batches = Batch::all();
+        return view('dashboard.index');
     }
 
     /**
@@ -42,56 +43,57 @@ class TestController extends Controller
      */
     public function store(Request $request)
     {
-        // $summary = json_decode($request->SummaryReport, true);
-        $summary = $request->SummaryReport;
-        if (!$this->checkTerminalExists($request->TerminalId)) {
+        foreach ($request->all() as $newBatch) {
+            $summary = json_decode($newBatch['SummaryReport'], true);
+        // $summary = $request->SummaryReport;
+        if (!$this->checkTerminalExists($newBatch['TerminalId'])) {
             $terminal = Terminal::create([
                 'merchant_name' => $summary['Merchant'],
-                'terminal_id' => intval($request->TerminalId),
+                'terminal_id' => intval($newBatch['TerminalId']),
             ]);
         } else {
-            $terminal = Terminal::where('terminal_id', '=', $request->TerminalId)->get()->first();
+            $terminal = Terminal::where('terminal_id', '=', $newBatch['TerminalId'])->get()->first();
         }
-        if (!$this->checkBatchExists($request->BatchId)) {
+        if (!$this->checkBatchExists($newBatch['BatchId'])) {
             $batch = Batch::create([
-                'batch_id' => $request->BatchId,
-                'BatchNumber' => $request->BatchNumber,
-                'Mmname' => $request->Mmname,
+                'batch_id' => $newBatch['BatchId'],
+                'BatchNumber' => $newBatch['BatchNumber'],
+                'Mmname' => $newBatch['Mmname'],
                 'terminal_id' => $terminal->id,
-                'TotalAmount' => $request->TotalAmount,
-                'DateOfClosing' => date('Y-m-d:H:i:s', strtotime($request->DateOfClosing)),
-                'DateOfCreating' => date('Y-m-d:H:i:s', strtotime($request->DateOfCreating)),
+                'TotalAmount' => $newBatch['TotalAmount'],
+                'DateOfClosing' => date('Y-m-d:H:i:s', strtotime($newBatch['DateOfClosing'])),
+                'DateOfCreating' => date('Y-m-d:H:i:s', strtotime($newBatch['DateOfCreating'])),
             ]);
             $summaryR = SummaryReport::create([
                 'batch_id' => $batch->id,
                 'merchant' => $summary['Merchant'],
                 'location' => $summary['Location'],
-                'app_config_name' => $summary['AppConfigName'],
+                // 'app_config_name' => $summary['AppConfigName'],
                 'tpn' => $summary['Tpn'],
                 'report_type' => $summary['ReportType'],
-                'open_date' => date('Y-m-d:H:i:s', strtotime($summary['OpenDate'])),
+                // 'open_date' => date('Y-m-d:H:i:s', strtotime($summary['OpenDate'])),
                 'batch_number' => $summary['BatchNumber'],
-                'batch_idt' => $summary['BatchId'],
-                'close_date' => date('Y-m-d:H:i:s', strtotime($summary['CloseDate'])),
+                // 'batch_idt' => $summary['BatchId'],
+                // 'close_date' => date('Y-m-d:H:i:s', strtotime($summary['CloseDate'])),
             ]);
             foreach ($summary['CardReports'] as $item) {
                 CardsReport::create([
                     'summary_report_id' => $summaryR->id,
                     'TypeName' => $item['TypeName'],
                     'PaymentTypeName' => $item['PaymentReports'][0]['PaymentTypeName'],
-                    'SubTotalAmount' => $item['PaymentReports'][0]['SubTotalAmount'],
-                    'SubTotalAmountFormatted' => $item['PaymentReports'][0]['SubTotalAmountFormatted'],
-                    'SurchargeAmount' => $item['PaymentReports'][0]['SurchargeAmount'],
-                    'SurchargeAmountFormatted' => $item['PaymentReports'][0]['SurchargeAmountFormatted'],
+                    // 'SubTotalAmount' => $item['PaymentReports'][0]['SubTotalAmount'],
+                    // 'SubTotalAmountFormatted' => $item['PaymentReports'][0]['SubTotalAmountFormatted'],
+                    // 'SurchargeAmount' => $item['PaymentReports'][0]['SurchargeAmount'],
+                    // 'SurchargeAmountFormatted' => $item['PaymentReports'][0]['SurchargeAmountFormatted'],
                     'TotalAmount' => $item['PaymentReports'][0]['TotalAmount'],
                     'TotalNumber' => $item['PaymentReports'][0]['TotalNumber'],
                 ]);
             }
         } else {
-            $batch = Batch::where('batch_id', '=', $request->BatchId)->get()->first();
+            $batch = Batch::where('batch_id', '=', $newBatch['BatchId'])->get()->first();
         }
 
-        foreach ($request->ListOfTransactions as $transaction) {
+        foreach ($newBatch['ListOfTransactions'] as $transaction) {
             if (!$this->checkTransactionExists($transaction)) {
                 Transaction::create([
                     'transaction_id' => $transaction,
@@ -100,6 +102,8 @@ class TestController extends Controller
                 ]);
             }
         }
+        }
+        
 
 
 

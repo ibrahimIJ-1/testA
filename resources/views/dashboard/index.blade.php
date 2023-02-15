@@ -19,7 +19,7 @@
             <table class="table  table-striped">
                 <thead>
                     <tr>
-                        <th scope="col">Id</th>
+                        <th scope="col">Batch Id</th>
                         <th scope="col">TotalAmount</th>
                         {{-- <th scope="col">Amount</th> --}}
                         {{-- <th scope="col">CardHolder</th> --}}
